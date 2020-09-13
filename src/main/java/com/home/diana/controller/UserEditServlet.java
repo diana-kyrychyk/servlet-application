@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 
@@ -30,43 +32,47 @@ public class UserEditServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String id = req.getParameter("id");
-        User user = null;
+
+        User user = new User();
+        List<Team> selectedTeams = new ArrayList<>();
         if (nonNull(id)) {
             user = userService.findById(Integer.valueOf(id));
-        } else {
-            user = new User();
+            selectedTeams = teamService.findByUser(Integer.valueOf(id));
         }
 
-        List<Team> teams = teamService.findAll();
+        List<Team> availableTeams = teamService.findAll();
 
-        List<Integer> userTeams = new ArrayList<>(Arrays.asList(3, 6));
 
-        req.setAttribute("teams", teams);
-        req.setAttribute("userTeams", userTeams);
+        req.setAttribute("availableTeams", availableTeams);
+        req.setAttribute("selectedTeams", selectedTeams);
         req.setAttribute("user", user);
         req.getRequestDispatcher("user/user-edit.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String idStr  = req.getParameter("id");
+        Integer id = nonNull(idStr) && !idStr.isEmpty() ? Integer.valueOf(idStr) : null;
         String firstName  = req.getParameter("firstName");
         String secondName  = req.getParameter("secondName");
         String login  = req.getParameter("login");
-        String idStr  = req.getParameter("id");
-        Integer id = nonNull(idStr) && !idStr.isEmpty() ? Integer.valueOf(idStr) : null;
-        String[] selectedTeamsNames = req.getParameterValues("teams");
+        String[] selectedTeamIdsStr = req.getParameterValues("selectedTeams");
+        List<Integer> selectedTeams = new ArrayList<>();
+        if (selectedTeamIdsStr != null) {
+            selectedTeams = Stream.of(selectedTeamIdsStr).map(Integer::valueOf).collect(Collectors.toList());
+        }
 
         User user = new User(id, firstName, secondName, login);
 
         if(nonNull(id)){
-            userService.update(user);
+            userService.update(user, selectedTeams);
         } else {
-            userService.create(user);
+            userService.create(user, selectedTeams);
         }
 
         req.setAttribute("message", "Team is created succesfully");
 
-        req.getRequestDispatcher("userlist").forward(req, resp);
+        req.getRequestDispatcher("user-list").forward(req, resp);
     }
 
     public void destroy(){ }

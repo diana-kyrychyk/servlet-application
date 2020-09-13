@@ -1,6 +1,6 @@
 CREATE TABLE teams (
-        id INT NOT NULL AUTO_INCREMENT,
-        firstName VARCHAR(100),
+        id SERIAL NOT NULL,
+        name VARCHAR(100),
         PRIMARY KEY (id)
 );
 

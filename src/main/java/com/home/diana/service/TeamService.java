@@ -3,6 +3,8 @@ package com.home.diana.service;
 import com.home.diana.dao.TeamDAO;
 import com.home.diana.entity.Team;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TeamService {
@@ -23,6 +25,10 @@ public class TeamService {
 
     public Team findById(int id){
         return teamDAO.findById(id);
+    }
+
+    public List<Team> findByUser(int userId) {
+        return teamDAO.findByUser(userId);
     }
 
 }

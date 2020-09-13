@@ -11,7 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebServlet;
 import java.util.List;
 
-@WebServlet("/teamlist")
+@WebServlet("/team-list")
 public class TeamListServlet implements Servlet {
 
     private TeamService teamService = new TeamService();

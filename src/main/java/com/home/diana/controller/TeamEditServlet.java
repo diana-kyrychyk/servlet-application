@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import static java.util.Objects.nonNull;
 
-@WebServlet("/edit-team")
+@WebServlet("/team-edit")
 public class TeamEditServlet extends HttpServlet {
 
     private TeamService teamService = new TeamService();
@@ -52,7 +52,7 @@ public class TeamEditServlet extends HttpServlet {
 
         request.setAttribute("message", "Team is created succesfully");
 
-        request.getRequestDispatcher("index.html").forward(request, response);
+        request.getRequestDispatcher("team-list").forward(request, response);
     }    
 
     public void destroy(){ }

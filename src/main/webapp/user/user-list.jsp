@@ -5,22 +5,17 @@
 
 <html>
 <head>
+	<title>User List</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta firstName="viewport" content="width=device-width, initial-scale=1">
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu"
-		  crossorigin="anonymous">
-
-	<!-- Optional theme -->
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ"
-		  crossorigin="anonymous">
-
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
-
-	<title>Users page</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
+
+<jsp:include page="../include/menu.jsp"/>
 
 <div class="container-fluid">
 		<table class="table table-hover">
@@ -29,6 +24,7 @@
 				<th>First Name</th>
 				<th>Second Name</th>
 				<th>Login</th>
+				<th>Teams</th>
 				<th>Actions</th>
 			</tr>
 			<c:forEach var="user" items="${users}">
@@ -37,6 +33,11 @@
 					<td>${user.firstName}</td>
 					<td>${user.secondName}</td>
 					<td>${user.login}</td>
+					<td>
+						<c:forEach var="team" items="${user.teams}">
+							<span class="badge badge-primary">${team.name}</span>
+						</c:forEach>
+					</td>
 					<td>
 						<a href="user-edit?id=${user.id}" class="btn btn-info" role="button">Edit</a>
 					</td>

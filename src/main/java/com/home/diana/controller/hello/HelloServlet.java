@@ -24,7 +24,7 @@ public class HelloServlet implements Servlet {
             .append("<h2>Hi, ")
             .append(name)
             .append("!</h2>")
-            .append("<a href='hello/hello-index.html'>Back</a>")
+            .append("<a href='hello/hello-index-old.html'>Back</a>")
             .append("</body></html>");
 
     }

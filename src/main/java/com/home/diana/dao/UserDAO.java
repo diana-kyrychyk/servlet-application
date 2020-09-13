@@ -1,6 +1,5 @@
 package com.home.diana.dao;
 
-import com.home.diana.entity.Team;
 import com.home.diana.entity.User;
 
 import java.sql.Connection;
@@ -15,14 +14,22 @@ public class UserDAO {
 
     public void create(User user) {
         String insertUser =
-                "insert into users (first_name, second_name) " +
-                        "values (?, ?);";
+                "insert into users (first_name, second_name, login) " +
+                        "values (?, ?, ?) ";
 
         try (Connection connection = ConnectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(insertUser);) {
+             PreparedStatement preparedStatement = connection.prepareStatement(insertUser, PreparedStatement.RETURN_GENERATED_KEYS);) {
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getSecondName());
-            preparedStatement.execute();
+            preparedStatement.setString(3, user.getLogin());
+            preparedStatement.executeUpdate();
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            if (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                user.setId(id);
+            } else {
+                throw new RuntimeException("User is not created");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -49,12 +56,59 @@ public class UserDAO {
         }
     }
 
+    public void updateTeamsForUser(int userId, List<Integer> selectedTeams) {
+        Connection connection = ConnectionFactory.getConnection();
+        try {
+            connection.setAutoCommit(false);
+            deleteUserTeams(userId, connection);
+            insertUserTeams(userId, selectedTeams, connection);
+            connection.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void deleteUserTeams(int userId, Connection connection) throws SQLException {
+        String deleteQuery = "delete from users_teams where user_id = ?";
+
+        try (PreparedStatement deletePreparedStatement = connection.prepareStatement(deleteQuery)) {
+            deletePreparedStatement.setInt(1, userId);
+            deletePreparedStatement.execute();
+        }
+    }
+
+    private void insertUserTeams(int userId, List<Integer> selectedTeams, Connection connection) throws SQLException {
+        String insertQuery = "insert into users_teams (user_id, team_id) " +
+                "values (?, ?);";
+
+        try (PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery)) {
+            for (int selectedTeam : selectedTeams) {
+                insertPreparedStatement.setInt(1, userId);
+                insertPreparedStatement.setInt(2, selectedTeam);
+                insertPreparedStatement.execute();
+            }
+        }
+    }
+
+
     public User findById(int userID) {
         String findByIdQuery = "SELECT id, first_name, second_name, login " +
                 "FROM users " +
                 "WHERE id = ? ";
 
-       User user = null;
+        User user = null;
 
         try (Connection connection = ConnectionFactory.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(findByIdQuery);) {
@@ -63,7 +117,7 @@ public class UserDAO {
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 String firstName = resultSet.getString("first_name");
                 String secondName = resultSet.getString("second_name");
                 String login = resultSet.getString("login");

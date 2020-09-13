@@ -92,5 +92,31 @@ public class TeamDAO {
         return team;
     }
 
+    public List<Team> findByUser(int userId) {
+        String findByUserQuery =
+                "SELECT t.id as team_id, t.name as team_name " +
+                        "FROM users_teams as ut " +
+                        "LEFT JOIN teams t on ut.team_id = t.id " +
+                        "WHERE  ut.user_id = ?; ";
+
+        List<Team> teams = new ArrayList<>();
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(findByUserQuery);) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("team_id");
+                String name = resultSet.getString("team_name");
+                Team team = new Team(id, name);
+                teams.add(team);
+            }
+            resultSet.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return teams;
+    }
 }
 

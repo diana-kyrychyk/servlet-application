@@ -1,6 +1,7 @@
 package com.home.diana.controller;
 
 import com.home.diana.entity.User;
+import com.home.diana.entity.dto.UserListDTO;
 import com.home.diana.service.UserService;
 
 import javax.servlet.Servlet;
@@ -11,7 +12,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebServlet;
 import java.util.List;
 
-@WebServlet("/userlist")
+@WebServlet("/user-list")
 public class UserListServlet implements Servlet {
 
     private UserService userService = new UserService();
@@ -21,7 +22,7 @@ public class UserListServlet implements Servlet {
 
     public void service(ServletRequest request, ServletResponse response) throws ServletException, java.io.IOException {
 
-        List<User> userList = userService.findAll();
+        List<UserListDTO> userList = userService.findAllDTO();
 
         request.setAttribute("users", userList);
 
